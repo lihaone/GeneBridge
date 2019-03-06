@@ -5,6 +5,7 @@
 library(data.table)
 library(parallel)
 library(limma)
+options(stringsAsFactors = F)
 set.seed(666)
 
 # for local computer
