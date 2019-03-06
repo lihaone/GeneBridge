@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-# script to compute the correlation coefficient between genes in respective pathways 
+# script to compute the correlation coefficient between genes in respective pathways
 options(stringsAsFactors = F)
 
 ##' @param arrayData data.frame of expression residual with genes as rows and individuals as columns, obtained from "peer.R"
@@ -9,15 +9,14 @@ options(stringsAsFactors = F)
 average_correlation_coefficients <- function(arrayData, pathways){
   rmatrix <- cor(t(arrayData))
   rmatrix <- round(rmatrix, digits = 3)
-  
+
   r.mean <- data.frame(pathway = names(pathways), gene.num = NA, mean = NA)
   for(i in 1:length(pathways)){
     pathway <- names(pathways)[i]
-    message(c(i, pathway))
+    print(c(i, pathway))
     match.genes <- which(rownames(rmatrix) %in% pathway)
     r.mean[i, 'gene.num'] <- length(match.genes)
     r.mean[i, 'mean'] <- mean(rmatrix[match.genes, match.genes], na.rm = T)
   }
   return(r.mean)
 }
-
