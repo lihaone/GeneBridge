@@ -15,4 +15,5 @@ Install other dependent packages `data.table`, `plyr`, `limma`
     BiocManager::install("limma", version = "3.8")
 ```    
 
-Citation: Li, H. et al. GeneBridge, a toolset to impute gene function by integration of multi-species expression compendia. Submitted. 
+### Citation
+Li, H. et al. GeneBridge, a toolset to impute gene function by integration of multi-species expression compendia. Submitted. 
