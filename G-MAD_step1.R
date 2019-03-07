@@ -1,5 +1,6 @@
 #!/usr/bin/env Rscript
 # script to run pathway analysis for all genes using camera 
+options(stringsAsFactors = F)
 
 ##' @param arrayData data.frame of expression residual with genes as rows and individuals as columns, obtained from "peer.R"
 ##' @param pathways list of pathways containing the gene entrez id for each pathway
@@ -8,7 +9,6 @@
 gmad_step1 <- function(arrayData, pathways){
   require(limma)
   require(data.table)
-  options(stringsAsFactors = F)
   set.seed(666)
   
   arrayData <- as.matrix(arrayData)

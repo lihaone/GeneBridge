@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript
 # script to remove both known and hidden covariates using PEER
 # partially adapted from: https://github.com/hall-lab/gtex
+options(stringsAsFactors = F)
 
 ##' @param mat numeric data.matrix of gene expressions with genes as rows and individuals as columns, with gene entrez ids as rownames
 ##' @param mat.aligner data.frame of 2 columns contaning the gene entrez id and gene symbols, with "id" and "gene" as colnames
@@ -10,7 +11,6 @@
 
 peer.residual <- function(mat, mat.aligner, covs, n.iteration = 1000){
   require(peer)
-  options(stringsAsFactors = F)
   set.seed(666)
   
   model <- PEER()
