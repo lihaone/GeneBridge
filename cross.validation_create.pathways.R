@@ -1,19 +1,12 @@
 # create query pathways for cross validation
 ### load pathways
 set.seed(666)
-main.dir <- './'
-setwd(main.dir)
-pathway.dir <- "data/pathway/"
+pathway.dir <- "./data/utils data/pathway/"
 all.species <- c('human', 'mouse', 'rat', 'fly', 'worm', 'yeast')
 
 for(species.i in all.species){
   # species.i <- 'human'
-  pathway.files <- list.files(pathway.dir, pattern="data", full.names=TRUE)
-  pathway.file <- grep(pattern=species.i, x=pathway.files, value=TRUE)
-  pathways <- readRDS(pathway.file)
-  # filter out gene sets with gene numbers less than 15 or larger than 1000
-  pathways <- pathways[which(lengths(pathways) >= 15)]
-  pathways <- pathways[which(lengths(pathways) <= 1000)]
+  pathways <- load.pathways(dir=pathway.dir, species=species.i)
 
   # output variables
   pathways.new <- list()
