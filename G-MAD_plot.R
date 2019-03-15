@@ -1,20 +1,28 @@
 #!/usr/bin/env Rscript
-# script to make GMAD plot for one pathway or one gene
+# script to make GMAD plot for one module/pathway or one gene
 
-##' @param data GMAD results for one pathway.      # data.frame of GMAD results for the given pathway against all genes (arranged in rows), should contain columns of gene id ('gene_id'), final GMAS ('mean.w'), and whether the gene-pathway connection is known ('pathway')
+##' @param data GMAD results for one module/pathway obtained from "gmad_step2_module" function in "G-MAD_step2.R". 
+##'             Data.frame of GMAD results for the given pathway against all genes (arranged in rows), 
+##'             should contain columns of gene id ('gene_id'), final GMAS ('mean.w'), and whether the gene-module/pathway connection is known ('pathway')
 ##' @param gene.pos gene position information, obtained from "load.gene.pos" function
 ##' @param species species for analysis
 ##' @param thres threshold for plotting. default as 0.268. 
-##' @return GMAD plot for pathway
+##' @return GMAD plot for one module/pathway.
 
-gmad_pathway_plot <- function(data, gene.pos, species, thres=0.268){
+data <- read.table('./data/output/GMAD_module/human--module_Reactome_R-HSA-191273.gz', header=T, sep='\t', quote="")
+gene.pos <- load.gene.pos(dir = "./data/utils data/gene position/", species='human')
+species <- 'human'
+
+gmad_module_plot(data, gene.pos, species, thres=0.268)
+
+gmad_module_plot <- function(data, gene.pos, species, thres=0.268){
   # keep only genes with data available from at least 30% of datasets
   data <- data[which(rowMeans(!is.na(data[,2:(ncol(data)-2)])) > 0.3),]
   
   data1 <- data[,c('gene_id','pathway','mean.w')]
   data1 <- data1[order(data1$mean.w, decreasing = T),]
   
-  # obtain the positions of pathways for plotting
+  # obtain the positions of genes for plotting
   data1 <- plyr::join(data1, gene.pos[,c(1,2,3,6)], by = "gene_id")
   data1 <- data1[!is.na(data1$chr),]
   
@@ -57,14 +65,15 @@ gmad_pathway_plot <- function(data, gene.pos, species, thres=0.268){
     text(x=data1[which(abs(data1$mean.w) >= thres),'pos'], y=data1[which(abs(data1$mean.w) >= thres),'mean.w'], labels=data1[which(abs(data1$mean.w) >= thres),'symbol'])
   }
   text(pos.labels, par("usr")[3] - 0.05, srt = 0, adj = 1, labels = names(pos.labels), xpd = TRUE, cex=1.3)
-  
 }
 
 
 
-##' @param data GMAD results for one gene      # data.frame of GMAD results for the given gene against all pathways (arranged in rows), should contain columns of pathway id ('path_id'), final GMAS ('mean.w'), and whether the gene-pathway connection is known ('pathway')
-##' @param pathway.pos pathway position information, obtained from "load.pathway.pos" function
-##' @param pathway.names pathway names information, obtained from "load.pathway.names" function
+##' @param data GMAD results for one gene obtained from "gmad_step2_gene" function in "G-MAD_step2.R". 
+##'             data.frame of GMAD results for the given gene against all pathways/modules (arranged in rows), 
+##'             should contain columns of pathway id ('path_id'), final GMAS ('mean.w'), and whether the gene-pathway/module connection is known ('pathway')
+##' @param pathway.pos pathway/module position information, obtained from "load.pathway.pos" function
+##' @param pathway.names pathway/module names information, obtained from "load.pathway.names" function
 ##' @param species species for analysis
 ##' @param thres threshold for plotting. default as 0.268. 
 ##' @return GMAD plot for one gene
@@ -82,7 +91,7 @@ gmad_gene_plot <- function(data, pathway.pos, pathway.names, species, thres=0.26
   data1[which(abs(data1$mean.w) >= 0.1),'size'] <- 3*abs(data1[which(abs(data1$mean.w) >= 0.1),'mean.w'])
   
   library(plyr)
-  # obtain the positions of pathways for plotting
+  # obtain the positions of pathways/modules for plotting
   data1 <- join(data1, pathway.pos, by = "path_id")
   # obtain pathway names
   data1 <- join(data1, pathway.names, by = "path_id")
@@ -98,7 +107,6 @@ gmad_gene_plot <- function(data, pathway.pos, pathway.names, species, thres=0.26
   if(length(which(abs(data1$mean.w) >= thres)) != 0){
     text(x=data1[which(abs(data1$mean.w) >= thres),'pos'], y=data1[which(abs(data1$mean.w) >= thres),'mean.w'], labels=data1[which(abs(data1$mean.w) >= thres),'path_name'])
   }
-  
 }
 
 
