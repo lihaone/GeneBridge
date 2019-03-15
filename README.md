@@ -5,7 +5,11 @@ For analyzed results for a given gene or module/gene set, please visit https://s
 
 ## Dependencies
 
-PEER. Installation: https://github.com/PMBio/peer/wiki/Installation-instructions
+Probabilistic Estimation of Expression Residuals (PEER). 
+
+Installation: https://github.com/PMBio/peer/wiki/Installation-instructions. 
+
+Reference: Stegle O. et al. Using probabilistic estimation of expression residuals (PEER) to obtain increased power and interpretability of gene expression analyses. Nat Protoc. 2012 
 
 Install other dependent packages `data.table`, `plyr`, `limma`
 ```R
@@ -16,6 +20,10 @@ Install other dependent packages `data.table`, `plyr`, `limma`
         install.packages("BiocManager")
     BiocManager::install("limma", version = "3.8")
 ```    
+Reference: 
+
+limma: Ritchie ME. et al. limma powers differential expression analyses for RNA-sequencing and microarray studies. Nucleic Acids Res. 2015. 
+
 
 ### Citation
 Li, H. et al. Identifying gene function and module connections by the integration of multi-species expression compendia. Submitted. 
