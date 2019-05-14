@@ -20,9 +20,7 @@ Reference: Stegle O. et al. Using probabilistic estimation of expression residua
         install.packages("BiocManager")
     BiocManager::install("limma", version = "3.8")
 ```    
-Reference: 
-
-limma: Ritchie ME. et al. limma powers differential expression analyses for RNA-sequencing and microarray studies. Nucleic Acids Res. 2015. https://academic.oup.com/nar/article/43/7/e47/2414268. 
+Reference: (limma) Ritchie ME. et al. limma powers differential expression analyses for RNA-sequencing and microarray studies. Nucleic Acids Res. 2015. https://academic.oup.com/nar/article/43/7/e47/2414268. 
 
 
 ## Citation
