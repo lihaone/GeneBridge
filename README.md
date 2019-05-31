@@ -24,4 +24,4 @@ Reference: (limma) Ritchie ME. et al. limma powers differential expression analy
 
 
 ## Citation
-Li, H. et al. Identifying gene function and module connections by the integration of multi-species expression compendia. Submitted. 
+Li, H. et al. Identifying gene function and module connections by the integration of multi-species expression compendia. preprint at bioRxiv (https://www.biorxiv.org/content/10.1101/649079v1). 
