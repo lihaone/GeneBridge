@@ -65,21 +65,21 @@ species <- 'human'
 
 # pathways: list containing the pathway/module information, obtained from 'load.pathways' function in 'utils.R'
 pathways <- load.pathways(dir='./data/utils data/pathway/', species=species)
-# load pathway.pos: module position in the x axis (used for plotting)
+# pathway.pos: module position in the x axis (used for plotting)
 pathway.pos <- load.pathway.pos(dir='./data/input/module position/', species=species)
-# load pathway.names: module names
+# pathway.names: module names
 pathway.names <- load.pathway.names(dir='./data/utils data/pathway/', species=species)
 
-# load gene2pathway: list containing the pathways/modules annotated to be linked to gene, obtained from 'load.gene2pathways' function in 'utils.R'
+# gene2pathway: list containing the pathways/modules annotated to be linked to gene, obtained from 'load.gene2pathways' function in 'utils.R'
 gene2pathways <- load.gene2pathways(dir='./data/utils data/gene2pathway/', species=species)
 
-# load gene.pos: gene position in the chromosomes (used for plotting)
+# gene.pos: gene position in the chromosomes (used for plotting)
 gene.pos <- load.gene.pos(dir='./data/utils data/gene position/', species=species)
 
-# load sample.size: data.frame containing the sample size information for all datasets, obtained from 'load.sample.size' function in 'utils.R'
+# sample.size: data.frame containing the sample size information for all datasets, obtained from 'load.sample.size' function in 'utils.R'
 sample.size <- load.sample.size(dir='./data/input/sample size/', species=species)
 
-# load r_mean: data.frame containing the average correlation coefficients for pathways in all datasets, obtained from 'load.r_mean' function in 'utils.R'
+# r_mean: data.frame containing the average correlation coefficients for pathways in all datasets, obtained from 'load.r_mean' function in 'utils.R'
 r_mean <- load.r_mean(dir='./data/input/r_mean/', species=species)
 
 # output directory
@@ -90,7 +90,7 @@ dir.create(out.dir)
 
 
 
-#### Step 2: first step of G-MAD (will take around 30 minutes for each data file (20k genes))
+#### Step 2: First step of G-MAD
 ```R
 source('G-MAD_analysis_step1.R')
 
@@ -105,13 +105,13 @@ for(data.file in data.files){
   tissue <- sapply(strsplit(data.file, split='//', fixed=TRUE), function(x) (x[2]))
   tissue <- gsub(pattern='_expr.peer.gct', replacement='', x=tissue, fixed=T)
 
-  results <- gmad_step1(data.file, pathways, num.cores=1)
+  results <- gmad_step1(data.file, pathways, num.cores=1) # change num.cores to enable parallel computing
   saveRDS(results, paste0(out.dir, 'GMAD_step1/', tissue, '.RDS'))
 }
 ```    
 
 
-#### Step 3: second step of G-MAD
+#### Step 3: Second step of G-MAD
 ```R
 source('G-MAD_analysis_step2.R')
 
