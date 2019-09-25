@@ -9,7 +9,7 @@
 
 
 peer.residual <- function(mat, mat.aligner, covs=NULL, n.iteration=1000){
-  require(peer)
+  library(peer)
   set.seed(666)
 
   model <- PEER()

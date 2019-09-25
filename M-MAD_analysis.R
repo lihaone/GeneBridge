@@ -24,11 +24,10 @@
 ##' @param pathways list of pathways containing the gene entrez id for each pathway, obtained from 'load.pathways' function in 'utils.R'
 ##' @return result.all data.table of camera p values between pathways and pathways.
 mmad_step1 <- function(data, pathways){
-  require(limma)
-  require(data.table)
+  library(limma)
+  library(data.table)
   set.seed(666)
 
-  result.all <- NULL
   for(i in 1:ncol(data)){
     dataset.id <- colnames(data)[i]
     print(c(i, dataset.id))
@@ -47,10 +46,10 @@ mmad_step1 <- function(data, pathways){
     result.i[which(result.i$Direction == 'Down'),'logp'] <- -result.i[which(result.i$Direction == 'Down'),'logp']
     result.i <- result.i[,which(colnames(result.i) %in% c('path_id', 'logp'))]
     result.i$logp[is.infinite(result.i$logp)] <- max(result.i$logp[is.finite(result.i$logp)], na.rm=T)  # replace Inf from -log10(p) by the maximum of the rest values
-    colnames(result.i)[which(colnames(result.i) %in% c('logp'))] <- dataset.id
+    colnames(result.i)[which(colnames(result.i) == 'logp')] <- dataset.id
 
     result.i <- data.table(result.i, key='path_id')
-    if(is.null(result.all)){
+    if(i == 1){
       result.all <- result.i
     }else{
       result.all <- merge(result.all, result.i, all=TRUE)
@@ -95,7 +94,7 @@ mmad_step2 <- function(result.all, pathways, sample.size, r_mean){
   datasets <- intersect(intersect(sample.size$tissue, colnames(result.all.sig)), colnames(r_mean)) # get the datasets with all data
 
   # compute the weighted average
-  sample.size.use <- sample.size[which(sample.size$tissue %in% datasets),] # should only use the common ones in match
+  sample.size.use <- sample.size[which(sample.size$tissue %in% datasets),] # should only use the common ones
 
   # get the gene correlations for the pathway and matched data.files
   r_mean.select <- r_mean[which(rownames(r_mean) == pathway), which(colnames(r_mean) %in% datasets)]

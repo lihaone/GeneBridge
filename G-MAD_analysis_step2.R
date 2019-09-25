@@ -22,7 +22,7 @@
 # out.dir <- './data/output/'
 
 gmad_step2_gene <- function(data.files, sample.size, r_mean, species, gene2pathways, gene.id, out.dir){
-  require(data.table)
+  library(data.table)
   # dir.create(paste0(out.dir, 'GMAD_gene_preBonf/'), showWarnings=F)
   dir.create(paste0(out.dir, 'GMAD_gene/'), showWarnings=F)
 
@@ -33,7 +33,7 @@ gmad_step2_gene <- function(data.files, sample.size, r_mean, species, gene2pathw
     class(data) <- 'data.frame'
     colnames(data)[1] <- 'path_id'
     tissue <- sapply(strsplit(data.file, split='//', fixed=TRUE), function(x) (x[2]))
-    tissue <- gsub(pattern='_all_camera.RDS', replacement='', x=tissue, fixed=T)
+    tissue <- gsub(pattern='.RDS', replacement='', x=tissue, fixed=T)
     message('loading data from #', i, ' dataset: ', tissue)
 
     data.i <- data[, which(colnames(data) %in% c('path_id', gene.id))]
@@ -127,7 +127,7 @@ gmad_step2_gene <- function(data.files, sample.size, r_mean, species, gene2pathw
 # gmad_step2_module(data.files, sample.size, r_mean, species, pathway.id, out.dir)
 
 gmad_step2_module <- function(data.files, sample.size, r_mean, species, pathways, pathway.id, out.dir){
-  require(data.table)
+  library(data.table)
   dir.create(paste0(out.dir, 'GMAD_module_preBonf/'), showWarnings=F)
   dir.create(paste0(out.dir, 'GMAD_module/'), showWarnings=F)
 
@@ -140,7 +140,7 @@ gmad_step2_module <- function(data.files, sample.size, r_mean, species, pathways
     data <- data[, -1]
     # colnames(data)[1] <- 'path_id'
     tissue <- sapply(strsplit(data.file, split='//', fixed=TRUE), function(x) (x[2]))
-    tissue <- gsub(pattern='_all_camera.RDS', replacement='', x=tissue, fixed=T)
+    tissue <- gsub(pattern='.RDS', replacement='', x=tissue, fixed=T)
     message('loading data from #', i, ' dataset: ', tissue)
 
     data.i <- data.frame(t(data[grep(pathway.id, rownames(data)), ]))
@@ -196,7 +196,7 @@ gmad_step2_module <- function(data.files, sample.size, r_mean, species, pathways
     next
   }
 
-  data.sig <- data.sig[,match(make.names(sample.size.use$tissue), make.names(colnames(data.sig)))]
+  data.sig <- data.sig[, match(make.names(sample.size.use$tissue), make.names(colnames(data.sig)))]
   data.sig <- data.frame(data.sig)
 
   data.sig$mean.w <- apply(data.sig, 1, FUN=function(x) weighted.mean(x, w=sqrt(sample.size.use$size)*sample.size.use$r.mean, na.rm=T))

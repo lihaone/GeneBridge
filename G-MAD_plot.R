@@ -20,7 +20,7 @@
 
 gmad_module_plot <- function(data, gene.pos, species, thres=0.268, show.name=T){
   # keep only genes with data available from at least 30% of datasets
-  data <- data[which(rowMeans(!is.na(data[, 2:(ncol(data)-2)])) > 0.3), ]
+  data <- data[which(rowMeans(!is.na(data[, 2:(ncol(data)-2)])) >= 0.3), ]
 
   data <- data[,c('gene_id','pathway','mean.w')]
   data <- data[order(data$mean.w, decreasing=T),]
@@ -97,7 +97,7 @@ gmad_module_plot <- function(data, gene.pos, species, thres=0.268, show.name=T){
 
 gmad_gene_plot <- function(data, pathway.pos, pathway.names, species, thres=0.268, show.name=T){
   # keep only genes with data available from at least 30% of datasets
-  data <- data[which(rowMeans(!is.na(data[,2:(ncol(data)-2)])) > 0.3), ]
+  data <- data[which(rowMeans(!is.na(data[,2:(ncol(data)-2)])) >= 0.3), ]
 
   data <- data[,c('path_id','pathway','mean.w')]
   data <- data[order(data$mean.w, decreasing=T),]

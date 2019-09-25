@@ -24,7 +24,7 @@ mmad_module_plot <- function(data, pathway.pos, pathway.names, species, thres=0.
   data$size <- thres
   data[which(abs(data$mean.w) >= 0.1), 'size'] <- 3*abs(data[which(abs(data$mean.w) >= 0.1), 'mean.w'])
 
-  require(plyr)
+  library(plyr)
   # obtain the positions of pathways for plotting
   data <- join(data, pathway.pos, by='path_id', type='inner')
   # obtain pathway names
