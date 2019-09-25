@@ -11,14 +11,17 @@ Installation: https://github.com/PMBio/peer/wiki/Installation-instructions.
 
 Reference: Stegle O. et al. Using probabilistic estimation of expression residuals (PEER) to obtain increased power and interpretability of gene expression analyses. Nat Protoc. 2012. https://www.nature.com/articles/nprot.2011.457
 
-#### Install other dependent packages `data.table`, `plyr`, `limma`
+#### Install other dependent packages `data.table`, `plyr`, `parallel`, `caret`, `limma`, `impute`
 ```R
     install.packages('data.table')
     install.packages('plyr')
+    install.packages('parallel')
+    install.packages('caret')
 
     if (!requireNamespace('BiocManager', quietly=TRUE))
         install.packages('BiocManager')
     BiocManager::install('limma', version='3.8')
+    BiocManager::install('impute')
 ```    
 Reference: (limma) Ritchie ME. et al. limma powers differential expression analyses for RNA-sequencing and microarray studies. Nucleic Acids Res. 2015. https://academic.oup.com/nar/article/43/7/e47/2414268.
 
