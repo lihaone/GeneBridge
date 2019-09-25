@@ -1,8 +1,8 @@
 #!/usr/bin/env Rscript
 # compute the correlation coefficient between genes in respective pathways
 
-##' @param arrayData data.frame of expression residual with genes as rows and individuals as columns, obtained from "peer.R"
-##' @param pathways list of pathways containing the gene entrez id for each pathway, obtained from "load.pathways" function in "utils.R"
+##' @param arrayData data.frame of expression residual with genes as rows and individuals as columns, obtained from 'peer.R'
+##' @param pathways list of pathways containing the gene entrez id for each pathway, obtained from 'load.pathways' function in 'utils.R'
 ##' @return r.mean data.frame of the average correlation coefficients of all pathways
 
 average_correlation_coefficients <- function(arrayData, pathways){

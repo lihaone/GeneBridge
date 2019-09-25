@@ -1,7 +1,7 @@
 # create query pathways for cross validation
 ### load pathways
 set.seed(666)
-pathway.dir <- "./data/utils data/pathway/"
+pathway.dir <- './data/utils data/pathway/'
 all.species <- c('human', 'mouse', 'rat', 'fly', 'worm', 'yeast')
 
 for(species.i in all.species){

@@ -4,26 +4,25 @@
 # # example:
 # species <- 'human'
 # data.files <- list.files('./data/output/GMAD_module_preBonf/', full.names=T)
-# pathways <- load.pathways(dir="./data/utils data/pathway/", species='human')
+# pathways <- load.pathways(dir='./data/utils data/pathway/', species=species)
 # out.dir <- './data/output/MMAD_module/'
-# 
+#
 # data.file <- data.files[1]
 # print(data.file)
 # pathway <- sapply(strsplit(data.file, split='//', fixed=TRUE), function(x) (x[2]))
 # pathway <- sapply(strsplit(pathway, split='--module_', fixed=TRUE), function(x) (x[2]))
-# pathway <- gsub(pattern=".gz", replacement="", x=pathway, fixed=T)
-# 
-# data <- read.table(data.file, header=T, sep='\t', quote="", row.names=1)
+# pathway <- gsub(pattern='.gz', replacement='', x=pathway, fixed=T)
+#
+# data <- read.table(data.file, header=T, sep='\t', quote='', row.names=1)
 # result.all <- mmad_step1(data, pathways)
 # result.all.sig <- mmad_step2(result.all, pathways, sample.size, r_mean)
-# 
-# write.table(result.all.sig, gzfile(paste0(out.dir,species,'--module_',pathway,'.gz')), quote=F, sep="\t", row.names=F, col.names=T)
+#
+# write.table(result.all.sig, gzfile(paste0(out.dir,species,'--module_',pathway,'.gz')), quote=F, sep='\t', row.names=F, col.names=T)
 
-##' @param data G-MAD results obtained from "gmad_step2_module" function in "G-MAD_step2.R". loaded from files in folder "./data/output/GMAD_module_preBonf/"
+##' @param data G-MAD results obtained from 'gmad_step2_module' function in 'G-MAD_step2.R'. loaded from files in folder './data/output/GMAD_module_preBonf/'
 ##'             data.frame containing -log10(p values) with pathways as rows and genes as columns, 1st row contains pathway ids.
-##' @param pathways list of pathways containing the gene entrez id for each pathway, obtained from "load.pathways" function in "utils.R"
+##' @param pathways list of pathways containing the gene entrez id for each pathway, obtained from 'load.pathways' function in 'utils.R'
 ##' @return result.all data.table of camera p values between pathways and pathways.
-
 mmad_step1 <- function(data, pathways){
   require(limma)
   require(data.table)
@@ -45,12 +44,12 @@ mmad_step1 <- function(data, pathways){
 
     result.i$path_id <- rownames(result.i)
     result.i$logp <- round(-log10(result.i$PValue), digits=3)
-    result.i[which(result.i$Direction == "Down"),"logp"] <- -result.i[which(result.i$Direction == "Down"),"logp"]
-    result.i <- result.i[,which(colnames(result.i) %in% c("path_id", "logp"))]
+    result.i[which(result.i$Direction == 'Down'),'logp'] <- -result.i[which(result.i$Direction == 'Down'),'logp']
+    result.i <- result.i[,which(colnames(result.i) %in% c('path_id', 'logp'))]
     result.i$logp[is.infinite(result.i$logp)] <- max(result.i$logp[is.finite(result.i$logp)], na.rm=T)  # replace Inf from -log10(p) by the maximum of the rest values
-    colnames(result.i)[which(colnames(result.i) %in% c("logp"))] <- dataset.id
+    colnames(result.i)[which(colnames(result.i) %in% c('logp'))] <- dataset.id
 
-    result.i <- data.table(result.i, key="path_id")
+    result.i <- data.table(result.i, key='path_id')
     if(is.null(result.all)){
       result.all <- result.i
     }else{
@@ -61,15 +60,15 @@ mmad_step1 <- function(data, pathways){
 }
 
 
-##' @param result.all results obtained from "mmad_step1" function in "M-MAD_analysis.R".
-##' @param pathways list of pathways/modules containing the gene entrez id for each pathway/module, obtained from "load.pathways" function in "utils.R"
-##' @param sample.size data.frame containing the sample size information for all datasets, obtained from "load.sample.size" function in "utils.R"
-##' @param r_mean data.frame containing the average correlation coefficients for pathways/modules in all datasets, obtained from "load.r_mean" function in "utils.R"
+##' @param result.all results obtained from 'mmad_step1' function in 'M-MAD_analysis.R'.
+##' @param pathways list of pathways/modules containing the gene entrez id for each pathway/module, obtained from 'load.pathways' function in 'utils.R'
+##' @param sample.size data.frame containing the sample size information for all datasets, obtained from 'load.sample.size' function in 'utils.R'
+##' @param r_mean data.frame containing the average correlation coefficients for pathways/modules in all datasets, obtained from 'load.r_mean' function in 'utils.R'
 ##' @return result.all.sig data.frame of final association between pathways/modules and pathways/modules.
 
 mmad_step2 <- function(result.all, pathways, sample.size, r_mean){
   result.all.sig <- result.all
-  class(result.all.sig) <- "data.frame"
+  class(result.all.sig) <- 'data.frame'
   rownames(result.all.sig) <- result.all.sig[,1]
   result.all.sig <- result.all.sig[, -1]
 

@@ -8,7 +8,7 @@
 ##' @return residuals data.frame of expression residual with genes as rows and individuals as columns
 
 
-peer.residual <- function(mat, mat.aligner, covs, n.iteration=1000){
+peer.residual <- function(mat, mat.aligner, covs=NULL, n.iteration=1000){
   require(peer)
   set.seed(666)
 
@@ -46,7 +46,9 @@ peer.residual <- function(mat, mat.aligner, covs, n.iteration=1000){
   PEER_setPhenoMean(model, t(as.matrix(mat)))
 
   # set covariates
-  PEER_setCovariates(model, as.matrix(covs))
+  if(!is.null(covs)){
+    PEER_setCovariates(model, as.matrix(covs))
+  }
 
   # set the number of covariates 25% of the sample number, but less than 100. (just a sufficiently large value)
   # ref: (PEER paper) https://www.nature.com/articles/nprot.2011.457

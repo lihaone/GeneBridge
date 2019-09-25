@@ -1,23 +1,23 @@
 #!/usr/bin/env Rscript
 # second step of G-MAD
-# meta-analysis of results obtained from "G-MAD_step1.R" for each gene across all analyzed datasets
+# meta-analysis of results obtained from 'G-MAD_analysis_step1.R' for each gene across all analyzed datasets
 
 ################################################################################################################################################
 ######  analysis for one gene vs all modules/pathways
-##' @param data.files data files in RDS format for all datasets resulted from "G-MAD_step1.R"
-##' @param sample.size data.frame containing the sample size information for all datasets, obtained from "load.sample.size" function in "utils.R"
-##' @param r_mean data.frame containing the average correlation coefficients for pathways in all datasets, obtained from "load.r_mean" function in "utils.R"
-##' @param gene2pathway list containing the pathways/modules annotated to be linked to gene, obtained from "load.gene2pathways" function in "utils.R"
+##' @param data.files data files in RDS format for all datasets resulted from 'G-MAD_analysis_step1.R'
+##' @param sample.size data.frame containing the sample size information for all datasets, obtained from 'load.sample.size' function in 'utils.R'
+##' @param r_mean data.frame containing the average correlation coefficients for pathways in all datasets, obtained from 'load.r_mean' function in 'utils.R'
+##' @param gene2pathway list containing the pathways/modules annotated to be linked to gene, obtained from 'load.gene2pathways' function in 'utils.R'
 ##' @param gene.id entrez gene id for the gene of interest
-##' @param out.dir output directory for output files, data will be saved in two subdirectory in "out.dir"
+##' @param out.dir output directory for output files, data will be saved in two subdirectory in 'out.dir'
 ##' @return data files before and after applying Bonferroni correction and meta-analysis
 
 ## example:
 # species <- 'human'
-# data.files <- list.files('~/Dropbox (Auwerx)/Hao Li/Gene set analysis/pgsa/data/output/human/merged/', full.names=T)
-# sample.size <- load.sample.size(dir="./data/input/sample size/", species='human')
-# r_mean <- load.r_mean(dir="./data/input/r_mean/", species='human')
-# gene2pathways <- load.gene2pathways(dir="./data/utils data/gene2pathway/", species='human')
+# data.files <- list.files('./data/output/human/merged/', full.names=T)
+# sample.size <- load.sample.size(dir='./data/input/sample size/', species=species)
+# r_mean <- load.r_mean(dir='./data/input/r_mean/', species=species)
+# gene2pathways <- load.gene2pathways(dir='./data/utils data/gene2pathway/', species=species)
 # gene.id <- 1
 # out.dir <- './data/output/'
 
@@ -30,10 +30,10 @@ gmad_step2_gene <- function(data.files, sample.size, r_mean, species, gene2pathw
   for(i in 1:length(data.files)){
     data.file <- data.files[i]
     data <- readRDS(data.file)
-    class(data) <- "data.frame"
+    class(data) <- 'data.frame'
     colnames(data)[1] <- 'path_id'
     tissue <- sapply(strsplit(data.file, split='//', fixed=TRUE), function(x) (x[2]))
-    tissue <- gsub(pattern="_all_camera.RDS", replacement="", x=tissue, fixed=T)
+    tissue <- gsub(pattern='_all_camera.RDS', replacement='', x=tissue, fixed=T)
     message('loading data from #', i, ' dataset: ', tissue)
 
     data.i <- data[, which(colnames(data) %in% c('path_id', gene.id))]
@@ -49,15 +49,15 @@ gmad_step2_gene <- function(data.files, sample.size, r_mean, species, gene2pathw
       data.all <- merge(data.all, data.i, all=TRUE)
     }
   }
-  class(data.all) <- "data.frame"
+  class(data.all) <- 'data.frame'
 
   # output
-  # write.table(data.all, gzfile(paste0(out.dir, 'GMAD_gene_preBonf/', species,"--gene_",gene.id,".gz")), quote=F, sep="\t", row.names=F, col.names=T)
+  # write.table(data.all, gzfile(paste0(out.dir, 'GMAD_gene_preBonf/', species,'--gene_',gene.id,'.gz')), quote=F, sep='\t', row.names=F, col.names=T)
 
   ### meta-analysis of -log10(p-values) from all datasets by taking weights of sample sizes and the average correlation coefficients for pathways in all datasets
   # apply Bonferroni correction on each datasets
   logp.thres <- -log10(0.05/nrow(data.all))
-  data.sig <- data.matrix(data.all[, -which(colnames(data.all) %in% "path_id")])
+  data.sig <- data.matrix(data.all[, -which(colnames(data.all) %in% 'path_id')])
   rownames(data.sig) <- data.all$path_id
   data.sig[which((data.sig > -logp.thres) & (data.sig < logp.thres))] <- 0
   data.sig[which(data.sig >= logp.thres)] <- 1
@@ -98,7 +98,7 @@ gmad_step2_gene <- function(data.files, sample.size, r_mean, species, gene2pathw
   data.all$pathway[which(data.all$path_id %in% pathway.genes)] <- 1
 
   # output
-  write.table(data.sig, gzfile(paste0(out.dir, 'GMAD_gene/', species,"--gene_",gene.id,".gz")), quote=F, sep="\t", row.names=F, col.names=T)
+  write.table(data.sig, gzfile(paste0(out.dir, 'GMAD_gene/', species,'--gene_',gene.id,'.gz')), quote=F, sep='\t', row.names=F, col.names=T)
 }
 
 
@@ -107,21 +107,21 @@ gmad_step2_gene <- function(data.files, sample.size, r_mean, species, gene2pathw
 
 ################################################################################################################################################
 ######  analysis for one module/pathway vs all genes
-##' @param data.files data files in RDS format for all datasets resulted from "G-MAD_step1.R"
-##' @param sample.size data.frame containing the sample size information for all datasets, obtained from "load.sample.size" function in "utils.R"
-##' @param r_mean data.frame containing the average correlation coefficients for pathways in all datasets, obtained from "load.r_mean" function in "utils.R"
-##' @param pathways list containing the pathway/module information, obtained from "load.pathways" function in "utils.R"
+##' @param data.files data files in RDS format for all datasets resulted from 'G-MAD_analysis_step1.R'
+##' @param sample.size data.frame containing the sample size information for all datasets, obtained from 'load.sample.size' function in 'utils.R'
+##' @param r_mean data.frame containing the average correlation coefficients for pathways in all datasets, obtained from 'load.r_mean' function in 'utils.R'
+##' @param pathways list containing the pathway/module information, obtained from 'load.pathways' function in 'utils.R'
 ##' @param pathway.id id for the pathway/module of interest
-##' @param out.dir output directory for output files, data will be saved in two subdirectory in "out.dir"
+##' @param out.dir output directory for output files, data will be saved in two subdirectory in 'out.dir'
 ##' @return data files before and after applying Bonferroni correction and meta-analysis
 
 ## example:
 # species <- 'human'
 # data.files <- list.files('~/Dropbox (Auwerx)/Hao Li/Gene set analysis/pgsa/data/output/human/merged/', full.names=T)
 # data.files <- data.files[1:5]
-# sample.size <- load.sample.size(dir="./data/input/sample size/", species='human')
-# r_mean <- load.r_mean(dir="./data/input/r_mean/", species='human')
-# pathways <- load.pathways(dir="./data/utils data/pathway/", species='human')
+# sample.size <- load.sample.size(dir='./data/input/sample size/', species=species)
+# r_mean <- load.r_mean(dir='./data/input/r_mean/', species=species)
+# pathways <- load.pathways(dir='./data/utils data/pathway/', species=species)
 # pathway.id <- 'Reactome_R-HSA-191273'
 # out.dir <- './data/output/'
 # gmad_step2_module(data.files, sample.size, r_mean, species, pathway.id, out.dir)
@@ -135,12 +135,12 @@ gmad_step2_module <- function(data.files, sample.size, r_mean, species, pathways
   for(i in 1:length(data.files)){
     data.file <- data.files[i]
     data <- readRDS(data.file)
-    class(data) <- "data.frame"
+    class(data) <- 'data.frame'
     rownames(data) <- data[,1]
     data <- data[, -1]
     # colnames(data)[1] <- 'path_id'
     tissue <- sapply(strsplit(data.file, split='//', fixed=TRUE), function(x) (x[2]))
-    tissue <- gsub(pattern="_all_camera.RDS", replacement="", x=tissue, fixed=T)
+    tissue <- gsub(pattern='_all_camera.RDS', replacement='', x=tissue, fixed=T)
     message('loading data from #', i, ' dataset: ', tissue)
 
     data.i <- data.frame(t(data[grep(pathway.id, rownames(data)), ]))
@@ -155,19 +155,19 @@ gmad_step2_module <- function(data.files, sample.size, r_mean, species, pathways
     if(is.null(data.all)){
       data.all <- data.i
     }else{
-      data.all <- merge(data.all, data.i, all=TRUE) 
+      data.all <- merge(data.all, data.i, all=TRUE)
     }
   }
-  class(data.all) <- "data.frame"
+  class(data.all) <- 'data.frame'
 
   # save data.all for M-MAD
-  write.table(data.all, gzfile(paste0(out.dir, 'GMAD_module_preBonf/',species,"--module_",pathway.id,".gz")), quote=F, sep="\t", row.names=F, col.names=T)
+  write.table(data.all, gzfile(paste0(out.dir, 'GMAD_module_preBonf/',species,'--module_',pathway.id,'.gz')), quote=F, sep='\t', row.names=F, col.names=T)
 
 
   ### meta-analysis of -log10(p-values) from all datasets by taking weights of sample sizes and the average correlation coefficients for pathways in all datasets
   # apply Bonferroni correction on each datasets
   logp.thres <- -log10(0.05/nrow(data.all))
-  data.sig <- data.matrix(data.all[, -which(colnames(data.all) %in% "gene_id")])
+  data.sig <- data.matrix(data.all[, -which(colnames(data.all) %in% 'gene_id')])
   rownames(data.sig) <- data.all$gene_id
   data.sig[which((data.sig > -logp.thres) & (data.sig < logp.thres))] <- 0
   data.sig[which(data.sig >= logp.thres)] <- 1
@@ -210,5 +210,5 @@ gmad_step2_module <- function(data.files, sample.size, r_mean, species, pathways
   data.sig$gene_id <- rownames(data.sig)
   data.sig <- data.sig[, c(ncol(data.sig), 1:(ncol(data.sig)-1))]
   # output
-  write.table(data.sig, gzfile(paste0(out.dir, 'GMAD_module/',species,"--module_",pathway.id,".gz")), quote=F, sep="\t", row.names=F, col.names=T)
+  write.table(data.sig, gzfile(paste0(out.dir, 'GMAD_module/',species,'--module_',pathway.id,'.gz')), quote=F, sep='\t', row.names=F, col.names=T)
 }
