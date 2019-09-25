@@ -32,7 +32,7 @@ source('utils.R')
 source('peer.R')
 
 # load gene id to symbol information
-mat.aligner <- read.table('data/utils data/gene info/human_gene_info.txt', header=T, sep='\t', quote='')
+mat.aligner <- read.table('./data/utils data/gene info/human_gene_info.txt', header=T, sep='\t', quote='')
 mat.aligner <- mat.aligner[, c('gene_id', 'symbol')]
 colnames(mat.aligner) <- c('id','gene')
 
@@ -40,6 +40,7 @@ data.dir <- './data/input/expr/'
 expr.files <- list.files(data.dir, pattern='_expr.gct', full.names=T)
 cov.files <- list.files(data.dir, pattern='_cov.txt', full.names=T)
 
+# use GSE77688 as the example
 tissue <- 'GSE77688'
 expr.file <- grep(tissue, expr.files, value=T)
 cov.file <- grep(tissue, cov.files, value=T)
@@ -60,23 +61,25 @@ write.table(peer.exp, out.file, quote=F, sep='\t', row.names=F, col.names=T)
 
 ### load utils data
 ```R
-# pathways: list containing the pathway/module information, obtained from "load.pathways" function in "utils.R"
+species <- 'human'
+
+# pathways: list containing the pathway/module information, obtained from 'load.pathways' function in 'utils.R'
 pathways <- load.pathways(dir='./data/utils data/pathway/', species=species)
-# load pathway.pos: module position in the x axis
+# load pathway.pos: module position in the x axis (used for plotting)
 pathway.pos <- load.pathway.pos(dir='./data/input/module position/', species=species)
 # load pathway.names: module names
 pathway.names <- load.pathway.names(dir='./data/utils data/pathway/', species=species)
 
-# load gene2pathway: list containing the pathways/modules annotated to be linked to gene, obtained from "load.gene2pathways" function in "utils.R"
+# load gene2pathway: list containing the pathways/modules annotated to be linked to gene, obtained from 'load.gene2pathways' function in 'utils.R'
 gene2pathways <- load.gene2pathways(dir='./data/utils data/gene2pathway/', species=species)
 
-# load gene.pos: gene position in the chromosomes
+# load gene.pos: gene position in the chromosomes (used for plotting)
 gene.pos <- load.gene.pos(dir='./data/utils data/gene position/', species=species)
 
-# load sample.size: data.frame containing the sample size information for all datasets, obtained from "load.sample.size" function in "utils.R"
+# load sample.size: data.frame containing the sample size information for all datasets, obtained from 'load.sample.size' function in 'utils.R'
 sample.size <- load.sample.size(dir='./data/input/sample size/', species=species)
 
-# load r_mean: data.frame containing the average correlation coefficients for pathways in all datasets, obtained from "load.r_mean" function in "utils.R"
+# load r_mean: data.frame containing the average correlation coefficients for pathways in all datasets, obtained from 'load.r_mean' function in 'utils.R'
 r_mean <- load.r_mean(dir='./data/input/r_mean/', species=species)
 
 # output directory
@@ -90,7 +93,6 @@ dir.create(out.dir)
 #### Step 2: first step of G-MAD (will take around 30 minutes for each data file (20k genes))
 ```R
 source('G-MAD_analysis_step1.R')
-species <- 'human'
 
 ## load data
 # data.files: data files after PEER correction
@@ -101,10 +103,10 @@ dir.create(paste0(out.dir,'GMAD_step1/'))
 for(data.file in data.files){
   print(data.file)
   tissue <- sapply(strsplit(data.file, split='//', fixed=TRUE), function(x) (x[2]))
-  tissue <- gsub(pattern="_expr.peer.gct", replacement="", x=tissue, fixed=T)
+  tissue <- gsub(pattern='_expr.peer.gct', replacement='', x=tissue, fixed=T)
 
-  results.all <- gmad_step1(data.file, pathways)
-  saveRDS(results.all, paste0(out.dir, 'GMAD_step1/', tissue, '_all_camera.RDS'))
+  results <- gmad_step1(data.file, pathways, num.cores=1)
+  saveRDS(results, paste0(out.dir, 'GMAD_step1/', tissue, '.RDS'))
 }
 ```    
 
@@ -114,10 +116,9 @@ for(data.file in data.files){
 source('G-MAD_analysis_step2.R')
 
 ### G-MAD analysis for one gene against all modules
-species <- 'human'
 
-# data.files: data files in RDS format for all datasets resulted from G-MAD_step1 function in "G-MAD_analysis_step1.R"
-data.files <- list.files('./data/output/GMAD_step1/', full.names=T)      
+# data.files: data files in RDS format for all datasets resulted from G-MAD_step1 function in 'G-MAD_analysis_step1.R'
+data.files <- list.files('./data/output/GMAD_step1/', pattern='RDS', full.names=T)      
 # create output directory for output files, data will be saved in the subdirectory ('GMAD_gene') of out.dir
 dir.create(paste0(out.dir,'GMAD_gene/'))
 
@@ -130,10 +131,9 @@ gmad_step2_gene(data.files, sample.size, r_mean, species, gene2pathways, gene.id
 
 ## make Manhattan plots for one gene against all modules
 source('G-MAD_plot.R')
-species <- 'human'
 
 # load data from gmad_step2_gene function
-data <- read.table('./data/output/GMAD_gene/human--gene_1652.gz', header=T, sep='\t', quote="")
+data <- read.table('./data/output/GMAD_gene/human--gene_1652.gz', header=T, sep='\t', quote='')
 
 # make plot
 gmad_gene_plot(data, pathway.pos, pathway.names, species, thres=0.268, show.name=T)
@@ -143,10 +143,9 @@ gmad_gene_plot(data, pathway.pos, pathway.names, species, thres=0.268, show.name
 ```R
 ### G-MAD analysis for one module against all genes
 source('G-MAD_analysis_step2.R')
-species <- 'human'
 
-# data.files: data files in RDS format for all datasets resulted from G-MAD_step1 function in "G-MAD_analysis_step1.R"
-data.files <- list.files('./data/output/GMAD_step1/', full.names=T)
+# data.files: data files in RDS format for all datasets resulted from G-MAD_step1 function in 'G-MAD_analysis_step1.R'
+data.files <- list.files('./data/output/GMAD_step1/', pattern='RDS', full.names=T)
 # create output directory for output files, data will be saved in two subdirectories ('GMAD_module_preBonf' and 'GMAD_module') of out.dir
 dir.create(paste0(out.dir,'GMAD_module_preBonf/'))
 dir.create(paste0(out.dir,'GMAD_module/'))
@@ -160,10 +159,9 @@ gmad_step2_module(data.files, sample.size, r_mean, species, pathways, pathway.id
 
 ## make Manhattan plots for one module against all genes
 source('G-MAD_plot.R')
-species <- 'human'
 
 # load data from gmad_step2_module function
-data <- read.table('./data/output/GMAD_module/human--module_Reactome_R-HSA-191273.gz', header=T, sep='\t', quote="")
+data <- read.table('./data/output/GMAD_module/human--module_Reactome_R-HSA-191273.gz', header=T, sep='\t', quote='')
 
 # make plot
 gmad_module_plot(data, gene.pos, species, thres=0.268, show.name=T)
@@ -174,10 +172,9 @@ gmad_module_plot(data, gene.pos, species, thres=0.268, show.name=T)
 #### Step 4. M-MAD
 ```R
 source('M-MAD_analysis.R')
-species <- 'human'
 
-# data.files: gz files in 'GMAD_module_preBonf' subfolder for all modules resulted from gmad_step2_module function in "G-MAD_analysis_step2.R"
-data.files <- list.files('./data/output/GMAD_module_preBonf/', full.names=T)
+# data.files: gz files in 'GMAD_module_preBonf' subfolder for all modules resulted from gmad_step2_module function in 'G-MAD_analysis_step2.R'
+data.files <- list.files('./data/output/GMAD_module_preBonf/', pattern='gz', full.names=T)
 # create output directory for output files, data will be saved in the subdirectory ('MMAD_module') of out.dir
 dir.create(paste0(out.dir, 'MMAD_module/'))
 
@@ -187,22 +184,21 @@ data.file <- grep(pathway.id, data.files, value=T)
 print(data.file)
 
 # load data
-data <- read.table(data.file, header=T, sep='\t', quote="", row.names=1)
+data <- read.table(data.file, header=T, sep='\t', quote='', row.names=1)
 
 # apply mmad_step1 and mmad_step2 functions
 result <- mmad_step1(data, pathways)
 result.sig <- mmad_step2(result, pathways, sample.size, r_mean)
 
 # export
-write.table(result.sig, gzfile(paste0(out.dir,'MMAD_module/',species,'--module_',pathway.id,'.gz')), quote=F, sep="\t", row.names=F, col.names=T)
+write.table(result.sig, gzfile(paste0(out.dir,'MMAD_module/',species,'--module_',pathway.id,'.gz')), quote=F, sep='\t', row.names=F, col.names=T)
 
 
 ## make Manhattan plots for one module against all modules
 source('M-MAD_plot.R')
-species <- 'human'
 
 # load data
-data <- read.table('./data/output/MMAD_module/human--GOBP_GO:0008610.gz', header=T, sep='\t', quote="")
+data <- read.table('./data/output/MMAD_module/human--module_GOBP_GO:0008610.gz', header=T, sep='\t', quote='')
 
 # make plot
 mmad_module_plot(data, pathway.pos, pathway.names, species, thres=0.268, show.name=T)
