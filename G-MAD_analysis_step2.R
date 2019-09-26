@@ -70,6 +70,7 @@ gmad_step2_gene <- function(data.files, sample.size, r_mean, species, gene2pathw
   colnames(data.sig) <- make.names(colnames(data.sig))
   colnames(r_mean) <- make.names(colnames(r_mean))
   datasets <- intersect(intersect(sample.size$tissue, colnames(data.sig)), colnames(r_mean)) # get the datasets with all data
+  if(length(datasets) <= 1) stop('number of datasets with sample.size and r_mean are only ',length(datasets),' , please include more datasets.')
 
   sample.size.use <- sample.size[which(sample.size$tissue %in% datasets), ]
   r_mean.use <- r_mean[, which(colnames(r_mean) %in% datasets)]
@@ -81,8 +82,7 @@ gmad_step2_gene <- function(data.files, sample.size, r_mean, species, gene2pathw
   r_mean.use <- r_mean.use[match(rownames(data.sig), rownames(r_mean.use)), ]
 
   if(nrow(sample.size.use) <= 1){
-    print(paste0('gene: ', gene.id, 'is not measured in enough datasets'))
-    next
+    stop('gene: ', gene.id, 'is not measured in enough datasets! ')
   }
 
   # merge the gene correlations and sample size data
@@ -95,7 +95,7 @@ gmad_step2_gene <- function(data.files, sample.size, r_mean, species, gene2pathw
   # add whether the target gene is annotated to be in the pathway or not
   gene.pathways <- as.character(unlist(gene2pathways[gene.id]))
   data.all$pathway <- 0
-  data.all$pathway[which(data.all$path_id %in% pathway.genes)] <- 1
+  data.all$pathway[which(data.all$path_id %in% gene.pathways)] <- 1
 
   # output
   write.table(data.sig, gzfile(paste0(out.dir, 'GMAD_gene/', species,'--gene_',gene.id,'.gz')), quote=F, sep='\t', row.names=F, col.names=T)

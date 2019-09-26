@@ -126,6 +126,7 @@ gmad_step1 <- function(data.file, pathways, num.cores=1){
 
     # merge the intermediate files from temp.dir
     data.files <- list.files(temp.dir, pattern='RDS', full.names=T)
+    message('merging all parts')
     results.all <- NULL
     for(data.file in data.files){
       results.x <- readRDS(data.file)

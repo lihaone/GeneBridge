@@ -65,7 +65,7 @@ mmad_step1 <- function(data, pathways){
 ##' @param r_mean data.frame containing the average correlation coefficients for pathways/modules in all datasets, obtained from 'load.r_mean' function in 'utils.R'
 ##' @return result.all.sig data.frame of final association between pathways/modules and pathways/modules.
 
-mmad_step2 <- function(result.all, pathways, sample.size, r_mean){
+mmad_step2 <- function(result.all, pathways, sample.size, r_mean, pathway.id){
   result.all.sig <- result.all
   class(result.all.sig) <- 'data.frame'
   rownames(result.all.sig) <- result.all.sig[,1]
@@ -79,32 +79,33 @@ mmad_step2 <- function(result.all, pathways, sample.size, r_mean){
   result.all.sig <- data.frame(result.all.sig)
 
   ### remove datasets for pathways based on enrichment results against themselves
-  data.row <- which(rownames(result.all.sig) == pathway)
+  data.row <- which(rownames(result.all.sig) == pathway.id)
   if(length(data.row) != 0){
     cols.rm <- which(result.all.sig[data.row, ] == 0)
     if(length(cols.rm) != 0){
-      print(paste0('removing ', length(cols.rm), ' columns for ', pathway))
+      print(paste0('removing ', length(cols.rm), ' columns for ', pathway.id))
       result.all.sig <- result.all.sig[, -cols.rm]
     }
   }
 
+  # get the datasets with all data
   colnames(result.all.sig) <- make.names(colnames(result.all.sig))
   sample.size$tissue <- make.names(sample.size$tissue)
   colnames(r_mean) <- make.names(colnames(r_mean))
-  datasets <- intersect(intersect(sample.size$tissue, colnames(result.all.sig)), colnames(r_mean)) # get the datasets with all data
+  datasets <- intersect(intersect(sample.size$tissue, colnames(result.all.sig)), colnames(r_mean))
+  if(length(datasets) <= 1) stop('number of datasets with sample.size and r_mean are only ',length(datasets),' , please include more datasets.')
 
   # compute the weighted average
   sample.size.use <- sample.size[which(sample.size$tissue %in% datasets),] # should only use the common ones
 
   # get the gene correlations for the pathway and matched data.files
-  r_mean.select <- r_mean[which(rownames(r_mean) == pathway), which(colnames(r_mean) %in% datasets)]
+  r_mean.select <- r_mean[which(rownames(r_mean) == pathway.id), which(colnames(r_mean) %in% datasets)]
   r_mean.use <- data.frame(tissue=colnames(r_mean.select), r.mean=as.numeric(r_mean.select[1,]))
   sample.size.use <- plyr::join(sample.size.use, r_mean.use, by='tissue', type='inner')
   sample.size.use <- sample.size.use[complete.cases(sample.size.use), ]
   result.all.sig <- result.all.sig[, match(sample.size.use$tissue, colnames(result.all.sig))]
 
-  if(is.null(ncol(result.all.sig))) next
-  if(ncol(result.all.sig) == 0) next
+  if(is.null(ncol(result.all.sig)) & (ncol(result.all.sig) == 0)) stop('not enough number of datasets')
 
   result.all.sig$mean.w <- apply(result.all.sig, 1, FUN=function(x) weighted.mean(x, w=sqrt(sample.size.use$size)*sample.size.use$r.mean, na.rm=T))
   result.all.sig$mean.w <- round(result.all.sig$mean.w, digits=3)
