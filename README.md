@@ -23,7 +23,7 @@ Reference: Stegle O. et al. Using probabilistic estimation of expression residua
     BiocManager::install('limma', version='3.8')
     BiocManager::install('impute')
 ```    
-Reference: (limma) Ritchie ME. et al. limma powers differential expression analyses for RNA-sequencing and microarray studies. Nucleic Acids Res. 2015. https://academic.oup.com/nar/article/43/7/e47/2414268.
+Reference: `limma` Ritchie ME. et al. limma powers differential expression analyses for RNA-sequencing and microarray studies. Nucleic Acids Res. 2015. https://academic.oup.com/nar/article/43/7/e47/2414268.
 
 ## Usage
 ```R
@@ -48,10 +48,15 @@ tissue <- 'GSE77688'
 expr.file <- grep(tissue, expr.files, value=T)
 cov.file <- grep(tissue, cov.files, value=T)
 
+if(length(cov.file) == 1){
+  covs <- read.table(cov.file, header=T, row.names=1, sep='\t', quote='')
+}else{
+  covs <- NULL
+}
+
 # load data
 mat <- read.table(expr.file, header=T, row.names=1, sep='\t', quote='')
 mat <- mat[, -1]
-covs <- read.table(cov.file, header=T, row.names=1, sep='\t', quote='')
 
 # apply PEER
 peer.exp <- peer.residual(mat, mat.aligner, covs, n.iteration=1000)
@@ -108,8 +113,8 @@ for(data.file in data.files){
   tissue <- sapply(strsplit(data.file, split='//', fixed=TRUE), function(x) (x[2]))
   tissue <- gsub(pattern='_expr.peer.gct', replacement='', x=tissue, fixed=T)
 
-  results <- gmad_step1(data.file, pathways, num.cores=1) # change num.cores to enable parallel computing
-  saveRDS(results, paste0(out.dir, 'GMAD_step1/', tissue, '.RDS'))
+  results <- gmad_step1(data.file, pathways, num.cores=4) # change num.cores to enable parallel computing
+  saveRDS(results, paste0(out.dir,'GMAD_step1/', tissue, '.RDS'))
 }
 ```    
 
@@ -126,7 +131,7 @@ data.files <- list.files('./data/output/GMAD_step1/', pattern='RDS', full.names=
 dir.create(paste0(out.dir,'GMAD_gene/'))
 
 # gene.id: entrez gene id for the gene of interest
-gene.id <- 1                    
+gene.id <- 1                
 
 # run the gmad_step2_gene function
 gmad_step2_gene(data.files, sample.size, r_mean, species, gene2pathways, gene.id, out.dir)
@@ -154,7 +159,7 @@ dir.create(paste0(out.dir,'GMAD_module_preBonf/'))
 dir.create(paste0(out.dir,'GMAD_module/'))
 
 # pathway.id: id for the pathway/module of interest
-pathway.id <- 'Reactome_R-HSA-191273'  
+pathway.id <- 'Reactome_R-HSA-611105'  
 
 ## run the gmad_step2_module function
 gmad_step2_module(data.files, sample.size, r_mean, species, pathways, pathway.id, out.dir)
@@ -182,7 +187,7 @@ data.files <- list.files('./data/output/GMAD_module_preBonf/', pattern='gz', ful
 dir.create(paste0(out.dir, 'MMAD_module/'))
 
 # pathway.id: id for the pathway/module of interest (use one dataset as the example )
-pathway.id <- 'Reactome_R-HSA-191273'
+pathway.id <- 'Reactome_R-HSA-611105'
 data.file <- grep(pathway.id, data.files, value=T)
 print(data.file)
 
@@ -191,7 +196,7 @@ data <- read.table(data.file, header=T, sep='\t', quote='', row.names=1)
 
 # apply mmad_step1 and mmad_step2 functions
 result <- mmad_step1(data, pathways)
-result.sig <- mmad_step2(result, pathways, sample.size, r_mean)
+result.sig <- mmad_step2(result, pathways, sample.size, r_mean, pathway.id)
 
 # export
 write.table(result.sig, gzfile(paste0(out.dir,'MMAD_module/',species,'--module_',pathway.id,'.gz')), quote=F, sep='\t', row.names=F, col.names=T)
