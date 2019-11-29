@@ -4,7 +4,7 @@ Systems analysis toolkit containing Gene-Module Association Determination (G-MAD
 For analyzed results for a given gene or module/gene set, please visit https://systems-genetics.org/genebridge.
 
 ## Citation
-Li, H. et al. Identifying gene function and module connections by the integration of multi-species expression compendia. In revision. Genome Research 2019. https://genome.cshlp.org/content/early/2019/11/21/gr.251983.119.abstract.
+Li, H. et al. Identifying gene function and module connections by the integration of multi-species expression compendia. Genome Res. 2019. https://genome.cshlp.org/content/early/2019/11/21/gr.251983.119.abstract.
 
 
 ## Dependencies
