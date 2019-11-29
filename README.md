@@ -3,6 +3,10 @@ Systems analysis toolkit containing Gene-Module Association Determination (G-MAD
 
 For analyzed results for a given gene or module/gene set, please visit https://systems-genetics.org/genebridge.
 
+## Citation
+Li, H. et al. Identifying gene function and module connections by the integration of multi-species expression compendia. In revision. Genome Research 2019. https://genome.cshlp.org/content/early/2019/11/21/gr.251983.119.abstract.
+
+
 ## Dependencies
 
 #### Probabilistic Estimation of Expression Residuals (PEER).
@@ -212,6 +216,3 @@ data <- read.table('./data/output/MMAD_module/human--module_GOBP_GO:0008610.gz',
 mmad_module_plot(data, pathway.pos, pathway.names, species, thres=0.268, show.name=T)
 ```
 
-
-## Citation
-Li, H. et al. Identifying gene function and module connections by the integration of multi-species expression compendia. In revision. preprint at bioRxiv (https://www.biorxiv.org/content/10.1101/649079v1).
