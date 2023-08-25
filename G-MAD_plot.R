@@ -26,7 +26,11 @@ gmad_module_plot <- function(data, gene.pos, species, thres=0.268, show.name=T){
   data <- data[order(data$mean.w, decreasing=T),]
 
   # obtain the positions of genes for plotting
-  data <- plyr::join(data, gene.pos[, c(1,2,3,6)], by='gene_id', type='inner')
+  if(species == 'athaliana'){
+    data <- plyr::join(data, gene.pos[, c(1,2,4,7)], by='gene_id', type='inner') 
+  }else{
+    data <- plyr::join(data, gene.pos[, c(1,2,3,6)], by='gene_id', type='inner')
+  }
   data <- data[!is.na(data$chr),]
 
   # set alternate color for nearby chromosomes
