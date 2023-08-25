@@ -94,8 +94,10 @@ gmad_step2_gene <- function(data.files, sample.size, r_mean, species, gene2pathw
 
   # add whether the target gene is annotated to be in the pathway or not
   gene.pathways <- as.character(unlist(gene2pathways[gene.id]))
-  data.all$pathway <- 0
-  data.all$pathway[which(data.all$path_id %in% gene.pathways)] <- 1
+  data.sig$pathway <- 0
+  data.sig$path_id <- rownames(data.sig)
+  data.sig <- data.sig[, c(ncol(data.sig), 1:(ncol(data.sig)-1))]
+  data.sig$pathway[which(data.sig$path_id %in% gene.pathways)] <- 1
 
   # output
   write.table(data.sig, gzfile(paste0(out.dir, 'GMAD_gene/', species,'--gene_',gene.id,'.gz')), quote=F, sep='\t', row.names=F, col.names=T)
